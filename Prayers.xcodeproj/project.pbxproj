@@ -423,6 +423,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 5Y8ZVY4N62;
 				INFOPLIST_FILE = Prayers/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -436,6 +437,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 5Y8ZVY4N62;
 				INFOPLIST_FILE = Prayers/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -522,6 +524,7 @@
 				AA631EBA1E69546900493B49 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AA631EBB1E69546900493B49 /* Build configuration list for PBXNativeTarget "PrayersTests" */ = {
 			isa = XCConfigurationList;
@@ -530,6 +533,7 @@
 				AA631EBD1E69546900493B49 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AA631EBE1E69546900493B49 /* Build configuration list for PBXNativeTarget "PrayersUITests" */ = {
 			isa = XCConfigurationList;
@@ -538,6 +542,7 @@
 				AA631EC01E69546900493B49 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
