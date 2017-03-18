@@ -1,4 +1,4 @@
-##Prayers##
+## Prayers ##
 
 A Prayertime SG app clone. 
 
