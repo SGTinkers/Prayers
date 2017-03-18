@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		AA631E911E69546900493B49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA631E901E69546900493B49 /* AppDelegate.swift */; };
 		AA631E961E69546900493B49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA631E941E69546900493B49 /* Main.storyboard */; };
-		AA631E991E69546900493B49 /* Prayers.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AA631E971E69546900493B49 /* Prayers.xcdatamodeld */; };
 		AA631E9B1E69546900493B49 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA631E9A1E69546900493B49 /* Assets.xcassets */; };
 		AA631E9E1E69546900493B49 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA631E9C1E69546900493B49 /* LaunchScreen.storyboard */; };
 		AA631EA91E69546900493B49 /* PrayersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA631EA81E69546900493B49 /* PrayersTests.swift */; };
@@ -39,7 +38,6 @@
 		AA631E8D1E69546900493B49 /* Prayers.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Prayers.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA631E901E69546900493B49 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA631E951E69546900493B49 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		AA631E981E69546900493B49 /* Prayers.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Prayers.xcdatamodel; sourceTree = "<group>"; };
 		AA631E9A1E69546900493B49 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA631E9D1E69546900493B49 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AA631E9F1E69546900493B49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -108,7 +106,6 @@
 				AA631E9C1E69546900493B49 /* LaunchScreen.storyboard */,
 				AA631E9F1E69546900493B49 /* Info.plist */,
 				AA631EC11E69549300493B49 /* 2017.json */,
-				AA631E971E69546900493B49 /* Prayers.xcdatamodeld */,
 			);
 			path = Prayers;
 			sourceTree = "<group>";
@@ -269,7 +266,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA631E991E69546900493B49 /* Prayers.xcdatamodeld in Sources */,
 				AA631EC41E69551E00493B49 /* PrayerTimingTableViewController.swift in Sources */,
 				AA631E911E69546900493B49 /* AppDelegate.swift in Sources */,
 			);
@@ -545,19 +541,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		AA631E971E69546900493B49 /* Prayers.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				AA631E981E69546900493B49 /* Prayers.xcdatamodel */,
-			);
-			currentVersion = AA631E981E69546900493B49 /* Prayers.xcdatamodel */;
-			path = Prayers.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = AA631E851E69546800493B49 /* Project object */;
 }

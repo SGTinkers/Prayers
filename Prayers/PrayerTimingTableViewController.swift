@@ -16,59 +16,49 @@ class PrayerTimingTableViewController: UITableViewController {
 	
 	let dateFormatter = DateFormatter()
 	let today = Date()
+	let notification = UNUserNotificationCenter.current()
 	
     override func viewDidLoad() {
         super.viewDidLoad()
 		
 		// remove all notifications on launch
-		let notification = UNUserNotificationCenter.current()
 		notification.removeAllPendingNotificationRequests()
 		notification.removeAllDeliveredNotifications()
 		
 		// json parsing
 		let path = Bundle.main.path(forResource: "2017", ofType: "json")
-		
-		let monthValue = Calendar.autoupdatingCurrent.component(.month, from: today)
-		
 		let url = NSURL.init(fileURLWithPath: path!)
 		if let data = NSData.init(contentsOf: url as URL) {
 			do {
 				let json = try JSONSerialization.jsonObject(with: data as Data, options: .allowFragments) as? [[[String: Any]]]
 				
-				for month in json! { // [[String: Any]]
-					for day in month { // [String: Any]
-						if let timesArray = day["times"] as? [String] {
+				var notifCounter = 0
+				
+				for monthIterator in json! { // [[String: Any]]
+					for dayIterator in monthIterator { // [String: Any]
+						if let timesArray = dayIterator["times"] as? [String] {
 							for time in timesArray {
-								if let date = self.getDateFrom(dateString: time) {
-									let monthValueToCompare = Calendar.autoupdatingCurrent.component(.month, from: date)
-									
-									if monthValue == monthValueToCompare {
-										// conversion for cell text is done later
-										dateFormatter.timeZone = TimeZone.init(abbreviation: "UTC")
-										dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.sssZ"
-										self.prayerStringArray.append(time)
-										
-										if let defaultDate = self.dateFormatter.date(from: time) {
-											// conversion for date object is done here
-										
-//											print("Date object (UTC): \(defaultDate)")
-
+								// ios only allows 64 notifications at one time
+								if notifCounter < 64 {
+									if let date = self.getDateFrom(dateString: time) {
+										if today.compare(date) == ComparisonResult.orderedSame || today.compare(date) == ComparisonResult.orderedAscending {
+											self.prayerStringArray.append(time)
+											
+											// craft a date by using date components
 											var dc = DateComponents()
-											dc.year = Calendar.autoupdatingCurrent.component(.year, from: defaultDate)
-											dc.month = Calendar.autoupdatingCurrent.component(.month, from: defaultDate)
-											dc.day = Calendar.autoupdatingCurrent.component(.day, from: defaultDate)
-											dc.hour = Calendar.autoupdatingCurrent.component(.hour, from: defaultDate)
-											dc.minute = Calendar.autoupdatingCurrent.component(.minute, from: defaultDate)
+											dc.year = Calendar.autoupdatingCurrent.component(.year, from: date)
+											dc.month = Calendar.autoupdatingCurrent.component(.month, from: date)
+											dc.day = Calendar.autoupdatingCurrent.component(.day, from: date)
+											dc.hour = Calendar.autoupdatingCurrent.component(.hour, from: date)
+											dc.minute = Calendar.autoupdatingCurrent.component(.minute, from: date)
 											
 											let localDate = Calendar.autoupdatingCurrent.date(from: dc)
 											
-//											let timezoneOffset = 60 * 60 * 8 // +8h
-//											
-//											let localDate = defaultDate.addingTimeInterval(TimeInterval(timezoneOffset))
-//											print("Date object (UTC +8): \(localDate)")
-											
 											// queue date for notifications
+											// every notification is now from this array
 											self.prayerDateArray.append(localDate!)
+											
+											notifCounter += 1
 										}
 									}
 								}
@@ -83,47 +73,41 @@ class PrayerTimingTableViewController: UITableViewController {
 		
 		// setup next notifications
 		for date in self.prayerDateArray {
-			let todayDay = Calendar.autoupdatingCurrent.component(.day, from: today)
-			let dayToCompare = Calendar.autoupdatingCurrent.component(.day, from: date)
-			
-			let todayHour = Calendar.autoupdatingCurrent.component(.hour, from: today)
-			let hourToCompare = Calendar.autoupdatingCurrent.component(.hour, from: date)
-			
-			// if one of the date object has the same date as today
-			if todayDay == dayToCompare {
-				// find the hour of the day that has not passed
-				if todayHour < hourToCompare {
-					// find its index
-					if let indexOfDateObject = self.prayerDateArray.index(of: date) {
-						let dateForNotification = self.prayerDateArray[indexOfDateObject]
-						
-						print(Calendar.autoupdatingCurrent.dateComponents([.year, .month, .day, .hour, .minute], from: dateForNotification))
-						print(Calendar.autoupdatingCurrent.dateComponents([.year, .month, .day, .hour, .minute], from: today))
-						
-						let newDateComponents = Calendar.autoupdatingCurrent.dateComponents([.year, .month, .day, .hour, .minute], from: dateForNotification)
-						
-						let notificationTrigger = UNCalendarNotificationTrigger.init(dateMatching: newDateComponents, repeats: false)
-						let notificationContent = UNMutableNotificationContent()
-						notificationContent.title = "This is a title"
-						notificationContent.body = "Time to pray"
-						notificationContent.sound = UNNotificationSound.default()
-						
-						let request = UNNotificationRequest.init(identifier: "Prayers", content: notificationContent, trigger: notificationTrigger)
-						notification.add(request, withCompletionHandler: { (error) in
-							if let error = error {
-								print("Oh no.. this is the error: \(error)")
-							}
-						})
-						
-						let alert = UIAlertController.init(title: "Hello", message: "Next alert is at \(newDateComponents)", preferredStyle: .alert)
-						let ok = UIAlertAction.init(title: "OK", style: .default, handler: nil)
-						alert.addAction(ok)
-						self.present(alert, animated: true, completion: nil)
-						
-						break
+			// find its index
+			if let indexOfDateObject = self.prayerDateArray.index(of: date) {
+				let dateForNotification = self.prayerDateArray[indexOfDateObject]
+				
+				print(Calendar.autoupdatingCurrent.dateComponents([.year, .month, .day, .hour, .minute], from: dateForNotification))
+				print(Calendar.autoupdatingCurrent.dateComponents([.year, .month, .day, .hour, .minute], from: today))
+				
+				// break down into date components
+				let dateComponents = Calendar.autoupdatingCurrent.dateComponents([.year, .month, .day, .hour, .minute], from: dateForNotification)
+				
+				// setup notification trigger
+				let notificationTrigger = UNCalendarNotificationTrigger.init(dateMatching: dateComponents, repeats: false)
+				// setup notification content
+				let notificationContent = UNMutableNotificationContent()
+				notificationContent.title = "It's prayers time"
+				notificationContent.body = "Time to pray"
+				notificationContent.sound = UNNotificationSound.default()
+				
+				// add notification trigger and content to notification request
+				let request = UNNotificationRequest.init(identifier: "Prayers\(indexOfDateObject)", content: notificationContent, trigger: notificationTrigger)
+				
+				// add the request
+				notification.add(request, withCompletionHandler: { (error) in
+					if let error = error {
+						print("Oh no.. this is the error: \(error)")
 					}
-				}
+				})
 			}
+		}
+		
+		self.notification.getPendingNotificationRequests { (request: [UNNotificationRequest]) in
+			let alert = UIAlertController.init(title: "Hello", message: "You have \(request.count) notifications lined up", preferredStyle: .alert)
+			let ok = UIAlertAction.init(title: "OK", style: .default, handler: nil)
+			alert.addAction(ok)
+			self.present(alert, animated: true, completion: nil)
 		}
     }
 
@@ -150,21 +134,26 @@ class PrayerTimingTableViewController: UITableViewController {
         // Configure the cell...
 		let dateString = self.prayerStringArray[indexPath.row]
 		
-		let newDateString = self.getLocalDateStringFrom(dateString: dateString)
+		let localDateString = self.getLocalDateString(from: dateString)
 		
-		cell.textLabel?.text = newDateString
+		cell.textLabel?.text = localDateString
 		
-
         return cell
     }
 	
-	func getLocalDateStringFrom(dateString: String) -> String {
-		dateFormatter.timeZone = TimeZone.init(abbreviation: "UTC")
-		dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+	// helper functions
+	func getLocalDateString(from dateString: String) -> String {
+		// setup a UTC formatted dateFormatter
+		self.dateFormatter.timeZone = TimeZone.init(abbreviation: "UTC")
+		self.dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+		
+		// get the date object
 		if let date = self.dateFormatter.date(from: dateString) {
+			// setup a current time zone formatted dateFormatter
 			dateFormatter.timeZone = TimeZone.autoupdatingCurrent
 			dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-
+			
+			// get the string
 			return self.dateFormatter.string(from: date)
 		} else {
 			print("Error")
@@ -174,54 +163,12 @@ class PrayerTimingTableViewController: UITableViewController {
 	}
 	
 	func getDateFrom(dateString: String) -> Date? {
+		// setup a UTC formatted dateFormatter
 		dateFormatter.timeZone = TimeZone.init(abbreviation: "UTC")
 		dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+		
+		// get the date
 		return dateFormatter.date(from: dateString)
 	}
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
